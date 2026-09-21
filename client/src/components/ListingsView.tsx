@@ -1,5 +1,7 @@
+import { motion } from "framer-motion";
 import { formatPrice, type Property } from "../data/properties";
 import FiltersSidebar, { type FilterState } from "./FiltersSidebar";
+import { fadeUp, staggerParent } from "../lib/anim";
 
 export type SortKey = "featured" | "price-low" | "price-high" | "newest" | "sqft";
 export type Layout = "grid" | "list";
@@ -48,8 +50,13 @@ export default function ListingsView({
   onToggleSave,
 }: Props) {
   return (
-    <main className="mx-auto max-w-[1440px] px-6 md:px-10 py-8 lg:h-[calc(100vh-72px)] lg:py-6 lg:flex lg:flex-col lg:overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8 lg:mb-5 shrink-0">
+    <motion.main
+      initial="hidden"
+      animate="show"
+      variants={staggerParent}
+      className="mx-auto max-w-[1440px] px-6 md:px-10 py-8 lg:h-[calc(100vh-72px)] lg:py-6 lg:flex lg:flex-col lg:overflow-hidden"
+    >
+      <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-between gap-4 mb-8 lg:mb-5 shrink-0">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
@@ -95,7 +102,7 @@ export default function ListingsView({
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid lg:grid-cols-[320px_1fr] gap-8 items-start lg:items-stretch lg:gap-6 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
         <div className="lg:min-h-0 lg:overflow-y-auto lg:pr-1 lg:pb-2">
@@ -128,10 +135,16 @@ export default function ListingsView({
               </button>
             </div>
           ) : (
-            <div className={layout === "grid" ? "grid md:grid-cols-2 gap-6" : "grid grid-cols-1 gap-4"}>
-              {results.map((c) => (
-                <button
+            <motion.div
+              variants={staggerParent}
+              className={layout === "grid" ? "grid md:grid-cols-2 gap-6" : "grid grid-cols-1 gap-4"}
+            >
+              {results.map((c, i) => (
+                <motion.button
                   key={c.id}
+                  variants={fadeUp}
+                  custom={i}
+                  layout
                   onClick={() => onOpen(c.id)}
                   className={`group text-left rounded-[28px] overflow-hidden bg-white border border-[#0A0A0A]/[0.06] shadow-[0_10px_30px_-18px_rgba(0,0,0,0.2)] hover:shadow-[0_30px_60px_-24px_rgba(0,0,0,0.35)] hover:-translate-y-1 transition-all duration-500 ${
                     layout === "list" ? "flex h-[200px]" : ""
@@ -187,12 +200,12 @@ export default function ListingsView({
                       </span>
                     </div>
                   </div>
-                </button>
+                </motion.button>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
-    </main>
+    </motion.main>
   );
 }

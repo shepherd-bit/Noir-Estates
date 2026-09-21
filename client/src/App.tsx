@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Toast from "./components/Toast";
 import Hero from "./components/Hero";
@@ -6,6 +7,7 @@ import CuratedSection from "./components/CuratedSection";
 import ListingsView, { type Layout, type SortKey } from "./components/ListingsView";
 import PropertyDetail, { type DetailTab } from "./components/PropertyDetail";
 import Footer from "./components/Footer";
+import { pageVariants } from "./lib/anim";
 import {
   PRICE_MAX,
   PRICE_MIN,
@@ -150,8 +152,16 @@ export default function App() {
       <Toast message={toast} />
       <Navbar view={view} onNavigate={navigate} onResetFilters={clearAll} />
 
+      <AnimatePresence mode="wait">
       {view === "landing" && (
-        <main className="mx-auto max-w-[1440px] px-6 md:px-10 overflow-hidden">
+        <motion.main
+          key="landing"
+          variants={pageVariants}
+          initial="hidden"
+          animate="show"
+          exit="exit"
+          className="mx-auto max-w-[1440px] px-6 md:px-10 overflow-hidden"
+        >
           <Hero hero={PROPERTIES[0]} isSaved={saved.has(1)} onToggleSave={toggleSave} />
           <CuratedSection
             filter={landingFilter}
@@ -166,10 +176,11 @@ export default function App() {
             }}
           />
           <Footer />
-        </main>
+        </motion.main>
       )}
 
       {view === "listings" && (
+        <motion.div key="listings" variants={pageVariants} initial="hidden" animate="show" exit="exit">
         <ListingsView
           results={filtered}
           layout={layout}
@@ -200,9 +211,11 @@ export default function App() {
           saved={saved}
           onToggleSave={toggleSave}
         />
+        </motion.div>
       )}
 
       {view === "detail" && (
+        <motion.div key={`detail-${selectedId}`} variants={pageVariants} initial="hidden" animate="show" exit="exit">
         <PropertyDetail
           property={selected}
           imageIndex={imageIndex}
@@ -213,7 +226,9 @@ export default function App() {
           onBackToLanding={() => setView("landing")}
           onOpen={openDetail}
         />
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

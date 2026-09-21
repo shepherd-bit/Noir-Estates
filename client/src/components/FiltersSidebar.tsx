@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import {
   AMENITIES,
   LOCATIONS,
@@ -9,6 +10,8 @@ import {
   YEAR_MIN,
   formatPrice,
 } from "../data/properties";
+
+import { slideFromLeft } from "../lib/anim";
 
 export interface FilterState {
   locations: string[];
@@ -51,7 +54,12 @@ export default function FiltersSidebar({
   onClear,
 }: Props) {
   return (
-    <aside className="rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_10px_40px_-20px_rgba(0,0,0,0.15)] p-6">
+    <motion.aside
+      variants={slideFromLeft}
+      initial="hidden"
+      animate="show"
+      className="rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_10px_40px_-20px_rgba(0,0,0,0.15)] p-6"
+    >
       <div className="flex items-center justify-between mb-6">
         <div className="text-[13px] font-[700] tracking-[0.08em]">FILTERS</div>
         <button
@@ -244,6 +252,6 @@ export default function FiltersSidebar({
           />
         </div>
       </div>
-    </aside>
+    </motion.aside>
   );
 }

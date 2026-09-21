@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { View } from "../App";
 
 interface Props {
@@ -8,7 +9,12 @@ interface Props {
 
 export default function Navbar({ view, onNavigate, onResetFilters }: Props) {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-[20px] bg-[#F7F5F2]/80 border-b border-[#0A0A0A]/[0.06] overflow-hidden">
+    <motion.nav
+      initial={{ y: -72, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-[20px] bg-[#F7F5F2]/80 border-b border-[#0A0A0A]/[0.06] overflow-hidden"
+    >
       <div className="mx-auto max-w-[1440px] px-6 md:px-10 h-[72px] flex items-center justify-between">
         <button
           onClick={() => {
@@ -63,6 +69,6 @@ export default function Navbar({ view, onNavigate, onResetFilters }: Props) {
           </button>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 }

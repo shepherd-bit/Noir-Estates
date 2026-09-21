@@ -1,4 +1,6 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { PROPERTIES, formatPrice, type Property } from "../data/properties";
+import { fadeUp, scaleIn, slideFromRight, staggerParent } from "../lib/anim";
 
 export type DetailTab = "overview" | "features" | "floorplan" | "neighborhood";
 
@@ -24,8 +26,13 @@ export default function PropertyDetail({
   onOpen,
 }: Props) {
   return (
-    <main className="mx-auto max-w-[1440px] px-6 md:px-10 py-6 md:py-8">
-      <div className="flex items-center gap-3 mb-6 text-[12px]">
+    <motion.main
+      initial="hidden"
+      animate="show"
+      variants={staggerParent}
+      className="mx-auto max-w-[1440px] px-6 md:px-10 py-6 md:py-8"
+    >
+      <motion.div variants={fadeUp} className="flex items-center gap-3 mb-6 text-[12px]">
         <button
           onClick={onBackToListings}
           className="w-9 h-9 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center hover:bg-black"
@@ -43,12 +50,23 @@ export default function PropertyDetail({
           <span>/</span>
           <span className="font-[600] text-[#0A0A0A]">{M.title.toUpperCase()}</span>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid lg:grid-cols-[1.6fr_0.9fr] gap-8 items-start">
-        <div>
-          <div className="relative rounded-[32px] overflow-hidden bg-[#E8E2DB] aspect-[16/11] group">
-            <img src={M.images[p]} alt={M.title} className="absolute inset-0 w-full h-full object-cover" />
+        <motion.div variants={fadeUp}>
+          <motion.div variants={scaleIn} className="relative rounded-[32px] overflow-hidden bg-[#E8E2DB] aspect-[16/11] group">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={`${M.id}-${p}`}
+                src={M.images[p]}
+                alt={M.title}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.45 }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </AnimatePresence>
             <div className="absolute top-5 left-5 flex gap-2">
               <div className="px-4 py-2 rounded-full bg-white/90 backdrop-blur text-[11px] font-[800]">
                 {formatPrice(M.price)}
@@ -80,7 +98,7 @@ export default function PropertyDetail({
                 <div className="text-[20px] font-[700] tracking-[-0.02em] mt-1">{M.title}</div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <div className="mt-4 grid grid-cols-6 gap-3">
             {M.images.map((c, idx) => (
@@ -112,6 +130,14 @@ export default function PropertyDetail({
             </div>
 
             <div className="mt-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={y}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35 }}
+                >
               {y === "overview" && (
                 <div className="max-w-[64ch]">
                   <p className="text-[20px] leading-[1.5] font-[400] tracking-[-0.02em]">{M.description}</p>
@@ -202,11 +228,16 @@ export default function PropertyDetail({
                   </p>
                 </div>
               )}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="lg:sticky lg:top-[88px] rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] p-7">
+        <motion.div
+          variants={slideFromRight}
+          className="lg:sticky lg:top-[88px] rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] p-7"
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-[32px] font-[800] tracking-[-0.04em] leading-none">{formatPrice(M.price)}</div>
@@ -279,10 +310,10 @@ export default function PropertyDetail({
           <div className="mt-3 text-center text-[10px] tracking-[0.06em] opacity-40">
             PRIVATE VIEWINGS • NO BROKERS • ARCHIVE ACCESS
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mt-20">
+      <motion.div variants={fadeUp} className="mt-20">
         <div className="flex items-end justify-between mb-6">
           <h3 className="text-[28px] font-[700] tracking-[-0.03em]">Similar — same typology</h3>
           <button
@@ -295,9 +326,13 @@ export default function PropertyDetail({
         <div className="grid md:grid-cols-3 gap-6">
           {PROPERTIES.filter((c) => c.type === M.type && c.id !== M.id)
             .slice(0, 3)
-            .map((c) => (
-              <button
+            .map((c, i) => (
+              <motion.button
                 key={c.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: i * 0.08 }}
                 onClick={() => onOpen(c.id)}
                 className="group text-left rounded-[24px] overflow-hidden bg-white border border-[#0A0A0A]/5 hover:-translate-y-1 transition-all"
               >
@@ -317,10 +352,10 @@ export default function PropertyDetail({
                     {c.location} • {c.sqft.toLocaleString()} ft²
                   </div>
                 </div>
-              </button>
+              </motion.button>
             ))}
         </div>
-      </div>
-    </main>
+      </motion.div>
+    </motion.main>
   );
 }

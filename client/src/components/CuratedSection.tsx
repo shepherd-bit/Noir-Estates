@@ -1,4 +1,6 @@
+import { motion } from "framer-motion";
 import { formatPrice, type Property } from "../data/properties";
+import { fadeUp, staggerParent, viewportOnce } from "../lib/anim";
 
 interface Props {
   filter: string;
@@ -12,8 +14,14 @@ interface Props {
 
 export default function CuratedSection({ filter, setFilter, items, saved, onToggleSave, onOpen, onViewAll }: Props) {
   return (
-    <section className="pt-20 pb-20">
-      <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
+    <motion.section
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+      variants={staggerParent}
+      className="pt-20 pb-20"
+    >
+      <motion.div variants={fadeUp} className="flex flex-wrap items-end justify-between gap-6 mb-10">
         <div>
           <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40 mb-3">CURATED SELECTION — 001/006</div>
           <h2 className="text-[44px] md:text-[64px] font-[800] tracking-[-0.05em] leading-[0.9]">
@@ -35,12 +43,13 @@ export default function CuratedSection({ filter, setFilter, items, saved, onTogg
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid md:grid-cols-12 gap-6 auto-rows-[380px] md:auto-rows-[420px]">
+      <motion.div variants={staggerParent} className="grid md:grid-cols-12 gap-6 auto-rows-[380px] md:auto-rows-[420px]">
         {items.map((c, idx) => (
-          <div
+          <motion.div
             key={c.id}
+            variants={fadeUp}
             className={`group relative text-left rounded-[32px] overflow-hidden bg-[#E8E2DB] shadow-[0_10px_30px_-16px_rgba(0,0,0,0.25)] hover:shadow-[0_30px_60px_-24px_rgba(0,0,0,0.4)] hover:-translate-y-1 transition-all duration-500 ${
               idx === 0
                 ? "md:col-span-7"
@@ -103,11 +112,11 @@ export default function CuratedSection({ filter, setFilter, items, saved, onTogg
                 </span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="mt-12 flex justify-center">
+      <motion.div variants={fadeUp} className="mt-12 flex justify-center">
         <button
           onClick={onViewAll}
           className="group h-[56px] px-8 rounded-full bg-[#0A0A0A] text-[#F7F5F2] text-[13px] tracking-[0.08em] font-[700] flex items-center gap-3 hover:bg-black hover:gap-5 transition-all"
@@ -117,7 +126,7 @@ export default function CuratedSection({ filter, setFilter, items, saved, onTogg
             ↗
           </span>
         </button>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
