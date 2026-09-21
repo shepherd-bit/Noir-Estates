@@ -112,7 +112,7 @@ export default function PropertyDetail({
             ))}
           </div>
 
-          <div className="mt-10">
+          <div id="neighborhood-overview" className="mt-10 scroll-mt-[104px]">
             <div className="flex gap-2 p-1 rounded-full bg-[#E8E2DB] w-fit">
               <span className="px-5 h-[36px] rounded-full text-[12px] font-[600] tracking-[0.04em] bg-[#0A0A0A] text-white flex items-center">
                 Neighborhood Overview
@@ -176,9 +176,10 @@ export default function PropertyDetail({
           </div>
         </motion.div>
 
+        <div className="lg:sticky lg:top-[88px] lg:self-start">
         <motion.div
           variants={slideFromRight}
-          className="lg:sticky lg:top-[88px] rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] p-7"
+          className="lg:max-h-[calc(100vh-104px)] lg:overflow-y-auto lg:overscroll-contain rounded-[28px] bg-white border border-[#0A0A0A]/[0.06] shadow-[0_20px_60px_-24px_rgba(0,0,0,0.25)] p-7 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#0A0A0A]/15"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -253,6 +254,7 @@ export default function PropertyDetail({
             PRIVATE VIEWINGS • NO BROKERS • ARCHIVE ACCESS
           </div>
         </motion.div>
+        </div>
       </div>
 
       <motion.div variants={fadeUp} className="mt-20">
