@@ -443,6 +443,61 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPropertyProperty extends Struct.CollectionTypeSchema {
+  collectionName: 'properties';
+  info: {
+    displayName: 'Property';
+    pluralName: 'properties';
+    singularName: 'property';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    AgentName: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    Amenities: Schema.Attribute.JSON;
+    AreaSize: Schema.Attribute.Decimal;
+    Bathrooms: Schema.Attribute.Integer;
+    Bedrooms: Schema.Attribute.Integer;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Description: Schema.Attribute.Text;
+    DiningAndCafes: Schema.Attribute.String;
+    Gallery: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    GettyTravelTime: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::property.property'
+    > &
+      Schema.Attribute.Private;
+    Location: Schema.Attribute.String;
+    NeighborhoodDescription: Schema.Attribute.Text;
+    NeighborhoodTagline: Schema.Attribute.String;
+    NeighborhoodTitle: Schema.Attribute.String;
+    Outdoors: Schema.Attribute.String;
+    Price: Schema.Attribute.BigInteger;
+    PropertyName: Schema.Attribute.String;
+    PropertyType: Schema.Attribute.Enumeration<
+      ['Villa', 'Penthouse', 'Townhouse', 'Estate', 'Apartment']
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    Schools: Schema.Attribute.String;
+    Shopping: Schema.Attribute.String;
+    Thumbanil: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    UCLATravelTime: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    WalkScore: Schema.Attribute.Integer;
+    YearBuilt: Schema.Attribute.BigInteger;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -954,6 +1009,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::property.property': ApiPropertyProperty;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

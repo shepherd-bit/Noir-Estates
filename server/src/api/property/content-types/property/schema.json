@@ -1,0 +1,112 @@
+{
+  "kind": "collectionType",
+  "collectionName": "properties",
+  "info": {
+    "singularName": "property",
+    "pluralName": "properties",
+    "displayName": "Property"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "PropertyName": {
+      "type": "string"
+    },
+    "PropertyType": {
+      "type": "enumeration",
+      "enum": [
+        "Villa",
+        "Penthouse",
+        "Townhouse",
+        "Estate",
+        "Apartment"
+      ]
+    },
+    "Price": {
+      "type": "biginteger"
+    },
+    "Location": {
+      "type": "string"
+    },
+    "Bedrooms": {
+      "type": "integer"
+    },
+    "Bathrooms": {
+      "type": "integer"
+    },
+    "AreaSize": {
+      "type": "decimal"
+    },
+    "YearBuilt": {
+      "type": "biginteger"
+    },
+    "Description": {
+      "type": "text"
+    },
+    "Amenities": {
+      "type": "json"
+    },
+    "Gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Thumbanil": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "AgentName": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "NeighborhoodTitle": {
+      "type": "string"
+    },
+    "NeighborhoodTagline": {
+      "type": "string"
+    },
+    "NeighborhoodDescription": {
+      "type": "text"
+    },
+    "DiningAndCafes": {
+      "type": "string"
+    },
+    "Shopping": {
+      "type": "string"
+    },
+    "Schools": {
+      "type": "string"
+    },
+    "Outdoors": {
+      "type": "string"
+    },
+    "WalkScore": {
+      "type": "integer"
+    },
+    "UCLATravelTime": {
+      "type": "string"
+    },
+    "GettyTravelTime": {
+      "type": "string"
+    }
+  }
+}

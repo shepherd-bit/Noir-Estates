@@ -3,8 +3,6 @@ import { formatPrice, type Property } from "../data/properties";
 import { fadeUp, staggerParent, viewportOnce } from "../lib/anim";
 
 interface Props {
-  filter: string;
-  setFilter: (v: string) => void;
   items: Property[];
   saved: Set<number>;
   onToggleSave: (id: number, e?: React.MouseEvent) => void;
@@ -12,7 +10,7 @@ interface Props {
   onViewAll: () => void;
 }
 
-export default function CuratedSection({ filter, setFilter, items, saved, onToggleSave, onOpen, onViewAll }: Props) {
+export default function CuratedSection({ items, saved, onToggleSave, onOpen, onViewAll }: Props) {
   return (
     <motion.section
       initial="hidden"
@@ -21,27 +19,14 @@ export default function CuratedSection({ filter, setFilter, items, saved, onTogg
       variants={staggerParent}
       className="pt-20 pb-20"
     >
-      <motion.div variants={fadeUp} className="flex flex-wrap items-end justify-between gap-6 mb-10">
+      <motion.div variants={fadeUp} className="mb-10">
         <div>
           <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40 mb-3">LATEST LISTINGS</div>
           <h2 className="text-[44px] md:text-[64px] font-[800] tracking-[-0.05em] leading-[0.9]">
-            Explore your
+            Explore for
             <br />
-            for your taste.
+            your taste.
           </h2>
-        </div>
-        <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#E8E2DB]">
-          {["all", "apartment", "villa", "land"].map((c) => (
-            <button
-              key={c}
-              onClick={() => setFilter(c)}
-              className={`px-4 h-[36px] rounded-full text-[12px] font-[600] tracking-[0.04em] capitalize transition ${
-                filter === c ? "bg-[#0A0A0A] text-white shadow" : "bg-transparent hover:bg-white/60"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
         </div>
       </motion.div>
 

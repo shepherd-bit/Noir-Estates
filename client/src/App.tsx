@@ -23,7 +23,6 @@ export type View = "landing" | "listings" | "detail";
 export default function App() {
   const [view, setView] = useState<View>("landing");
   const [selectedId, setSelectedId] = useState(1);
-  const [landingFilter, setLandingFilter] = useState("all");
   const [layout, setLayout] = useState<Layout>("grid");
   const [sort, setSort] = useState<SortKey>("featured");
   const [tab, setTab] = useState<DetailTab>("neighborhood");
@@ -106,10 +105,8 @@ export default function App() {
   }, [locations, price, types, beds, baths, sqft, amenityFilters, years, sort]);
 
   const curated = useMemo(() => {
-    let c = PROPERTIES.filter((V) => V.featured);
-    if (landingFilter !== "all") c = c.filter((V) => V.type === landingFilter);
-    return c.slice(0, 4);
-  }, [landingFilter]);
+    return PROPERTIES.filter((V) => V.featured).slice(0, 4);
+  }, []);
 
   const handleSearch = () => {
     const c: string[] = [];
@@ -164,8 +161,6 @@ export default function App() {
         >
           <Hero hero={PROPERTIES[0]} isSaved={saved.has(1)} onToggleSave={toggleSave} />
           <CuratedSection
-            filter={landingFilter}
-            setFilter={setLandingFilter}
             items={curated}
             saved={saved}
             onToggleSave={toggleSave}
