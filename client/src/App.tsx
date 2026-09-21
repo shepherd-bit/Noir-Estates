@@ -21,12 +21,27 @@ import {
 
 export type View = "landing" | "listings" | "detail";
 
+function parseHash(): { view: View; id: number | null } {
+  if (typeof window === "undefined") return { view: "landing", id: null };
+  const h = window.location.hash.replace(/^#/, "");
+  if (h.startsWith("/listings")) return { view: "listings", id: null };
+  const m = h.match(/^\/property\/(\d+)/);
+  if (m) return { view: "detail", id: Number(m[1]) };
+  return { view: "landing", id: null };
+}
+
+function hashFor(view: View, id?: number | null): string {
+  if (view === "listings") return "#/listings";
+  if (view === "detail" && id != null) return `#/property/${id}`;
+  return "#/";
+}
+
 export default function App() {
-  const [view, setView] = useState<View>("landing");
+  const [view, setView] = useState<View>(() => parseHash().view);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(() => parseHash().id);
   const [layout, setLayout] = useState<Layout>("grid");
   const [sort, setSort] = useState<SortKey>("featured");
   const [tab, setTab] = useState<DetailTab>("neighborhood");
@@ -53,6 +68,20 @@ export default function App() {
 
   useEffect(() => {
     load();
+  }, []);
+
+  useEffect(() => {
+    const syncFromHash = () => {
+      const parsed = parseHash();
+      setView(parsed.view);
+      if (parsed.view === "detail" && parsed.id !== null) {
+        setSelectedId(parsed.id);
+        setImageIndex(0);
+      }
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
   }, []);
 
   const showToast = (msg: string) => {
@@ -140,11 +169,20 @@ export default function App() {
   };
 
   const navigate = (v: View, msg?: string) => {
-    setView(v);
+    if (v !== "detail") {
+      const h = hashFor(v);
+      if (window.location.hash !== h) window.location.hash = h;
+      else window.scrollTo(0, 0);
+      setView(v);
+    } else {
+      setView(v);
+    }
     if (msg) showToast(msg);
   };
 
   const openDetail = (id: number) => {
+    const h = hashFor("detail", id);
+    if (window.location.hash !== h) window.location.hash = h;
     setSelectedId(id);
     setImageIndex(0);
     setView("detail");
@@ -200,7 +238,7 @@ export default function App() {
                 onToggleSave={toggleSave}
                 onOpen={openDetail}
                 onViewAll={() => {
-                  setView("listings");
+                  navigate("listings");
                   window.scrollTo(0, 0);
                 }}
               />
@@ -237,7 +275,7 @@ export default function App() {
           setAmenities={setAmenityFilters}
           setYears={setYears}
           onClear={clearAll}
-          onBack={() => setView("landing")}
+          onBack={() => navigate("landing")}
           onOpen={openDetail}
           saved={saved}
           onToggleSave={toggleSave}
@@ -254,10 +292,22 @@ export default function App() {
           setImageIndex={setImageIndex}
           tab={tab}
           setTab={setTab}
-          onBackToListings={() => setView("listings")}
-          onBackToLanding={() => setView("landing")}
+          onBackToListings={() => navigate("listings")}
+          onBackToLanding={() => navigate("landing")}
           onOpen={openDetail}
         />
+        </motion.div>
+      )}
+      {view === "detail" && !selected && !loading && !error && (
+        <motion.div key="detail-missing" variants={pageVariants} initial="hidden" animate="show" exit="exit" className="mx-auto max-w-[1440px] px-6 md:px-10 py-24 text-center">
+          <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40">RESIDENCE NOT FOUND</div>
+          <div className="mt-3 text-[22px] font-[700]">This listing is no longer published.</div>
+          <button
+            onClick={() => navigate("listings")}
+            className="mt-6 h-11 px-6 rounded-full bg-[#0A0A0A] text-white text-[12px] font-[700] tracking-[0.08em]"
+          >
+            BACK TO PROPERTIES
+          </button>
         </motion.div>
       )}
       </AnimatePresence>
