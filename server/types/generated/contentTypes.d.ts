@@ -454,7 +454,7 @@ export interface ApiPropertyProperty extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    AgentName: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    AgentName: Schema.Attribute.String;
     Amenities: Schema.Attribute.JSON;
     AreaSize: Schema.Attribute.Decimal;
     Bathrooms: Schema.Attribute.Integer;

@@ -68,16 +68,6 @@
         "audios"
       ]
     },
-    "AgentName": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "NeighborhoodTitle": {
       "type": "string"
     },
@@ -106,6 +96,9 @@
       "type": "string"
     },
     "GettyTravelTime": {
+      "type": "string"
+    },
+    "AgentName": {
       "type": "string"
     }
   }
