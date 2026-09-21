@@ -156,7 +156,7 @@ export default function ListingsView({
                     }`}
                   >
                     <img
-                      src={c.images[0]}
+                      src={c.images[0] ?? ""}
                       alt={c.title}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-[1.2s]"
                     />

@@ -4,13 +4,14 @@ import { fadeUp, staggerParent, viewportOnce } from "../lib/anim";
 
 interface Props {
   items: Property[];
+  total: number;
   saved: Set<number>;
   onToggleSave: (id: number, e?: React.MouseEvent) => void;
   onOpen: (id: number) => void;
   onViewAll: () => void;
 }
 
-export default function CuratedSection({ items, saved, onToggleSave, onOpen, onViewAll }: Props) {
+export default function CuratedSection({ items, total, saved, onToggleSave, onOpen, onViewAll }: Props) {
   return (
     <motion.section
       initial="hidden"
@@ -30,6 +31,12 @@ export default function CuratedSection({ items, saved, onToggleSave, onOpen, onV
         </div>
       </motion.div>
 
+      {items.length === 0 ? (
+        <div className="rounded-[32px] bg-white border border-dashed border-[#0A0A0A]/15 p-16 text-center">
+          <div className="text-[18px] font-[600]">No residences published yet</div>
+          <div className="text-[13px] opacity-60 mt-2">Publish a Property in Strapi and it will appear here.</div>
+        </div>
+      ) : (
       <motion.div variants={staggerParent} className="grid md:grid-cols-12 gap-6 auto-rows-[380px] md:auto-rows-[420px]">
         {items.map((c, idx) => (
           <motion.div
@@ -50,11 +57,13 @@ export default function CuratedSection({ items, saved, onToggleSave, onOpen, onV
               className="absolute inset-0 w-full h-full"
               aria-label={c.title}
             >
-              <img
-                src={c.images[0]}
-                alt={c.title}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] group-hover:scale-[1.08]"
-              />
+              {c.images[0] ? (
+                <img
+                  src={c.images[0]}
+                  alt={c.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] group-hover:scale-[1.08]"
+                />
+              ) : null}
             </button>
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
             <div className="absolute top-5 left-5 flex items-center gap-2 pointer-events-none">
@@ -78,8 +87,12 @@ export default function CuratedSection({ items, saved, onToggleSave, onOpen, onV
             <div className="absolute bottom-0 left-0 right-0 p-7 text-white pointer-events-none">
               <div className="flex items-center gap-2 text-[11px] tracking-[0.08em] opacity-80">
                 <span>{c.location.toUpperCase()}</span>
-                <span>•</span>
-                <span>{c.coordinates}</span>
+                {c.coordinates ? (
+                  <>
+                    <span>•</span>
+                    <span>{c.coordinates}</span>
+                  </>
+                ) : null}
               </div>
               <h3 className="mt-2 text-[28px] font-[700] tracking-[-0.03em] leading-[0.95]">{c.title}</h3>
               <div className="mt-4 flex items-center gap-4 text-[12px] font-[500]">
@@ -100,13 +113,14 @@ export default function CuratedSection({ items, saved, onToggleSave, onOpen, onV
           </motion.div>
         ))}
       </motion.div>
+      )}
 
       <motion.div variants={fadeUp} className="mt-12 flex justify-center">
         <button
           onClick={onViewAll}
           className="group h-[56px] px-8 rounded-full bg-[#0A0A0A] text-[#F7F5F2] text-[13px] tracking-[0.08em] font-[700] flex items-center gap-3 hover:bg-black hover:gap-5 transition-all"
         >
-          VIEW ALL LISTINGS — 12 PROPERTIES{" "}
+          VIEW ALL LISTINGS — {total} {total === 1 ? "PROPERTY" : "PROPERTIES"}{" "}
           <span className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center group-hover:rotate-45 transition-transform">
             ↗
           </span>

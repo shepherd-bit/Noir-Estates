@@ -5,10 +5,13 @@ import imgMe from "../assets/img-me.webp";
 import imgXe from "../assets/img-xe.webp";
 import imgJe from "../assets/img-je.webp";
 
-export type PropertyType = "villa" | "apartment" | "land";
+export type PropertyType = "villa" | "apartment" | "penthouse" | "townhouse" | "estate" | "land";
+
+export const PROPERTY_TYPES: PropertyType[] = ["villa", "apartment", "penthouse", "townhouse", "estate"];
 
 export interface Property {
   id: number;
+  documentId?: string;
   title: string;
   price: number;
   location: string;
@@ -23,6 +26,17 @@ export interface Property {
   description: string;
   images: string[];
   coordinates: string;
+  neighborhoodTitle?: string;
+  neighborhoodTagline?: string;
+  neighborhoodDescription?: string;
+  dining?: string;
+  shopping?: string;
+  schools?: string;
+  outdoors?: string;
+  walkScore?: number;
+  uclaTime?: string;
+  gettyTime?: string;
+  agentName?: string;
 }
 
 export const PROPERTIES: Property[] = [

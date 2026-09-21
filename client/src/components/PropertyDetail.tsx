@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { PROPERTIES, formatPrice, getNeighborhood, type Property } from "../data/properties";
+import { formatPrice, getNeighborhood, type Property } from "../data/properties";
 import { fadeUp, scaleIn, slideFromRight, staggerParent } from "../lib/anim";
 
 export type DetailTab = "neighborhood";
 
 interface Props {
   property: Property;
+  allProperties: Property[];
   imageIndex: number;
   setImageIndex: (v: number) => void;
   tab?: DetailTab;
@@ -17,12 +18,43 @@ interface Props {
 
 export default function PropertyDetail({
   property: M,
+  allProperties,
   imageIndex: p,
   setImageIndex: h,
   onBackToListings,
   onBackToLanding,
   onOpen,
 }: Props) {
+  const imageCount = M.images.length;
+  const safeIndex = imageCount === 0 ? 0 : p % imageCount;
+  const currentImage = imageCount === 0 ? undefined : M.images[safeIndex];
+
+  const fallbackNeighborhood = getNeighborhood(M.location);
+  const neighborhood = {
+    title: M.neighborhoodTitle ?? `${M.location.toUpperCase()}${M.city ? ` • ${M.city.toUpperCase()}` : ""}`,
+    tagline: M.neighborhoodTagline ?? fallbackNeighborhood.tagline,
+    description: M.neighborhoodDescription ?? fallbackNeighborhood.description,
+    highlights:
+      M.dining || M.shopping || M.schools || M.outdoors
+        ? [
+            { label: "Dining & Cafés", value: M.dining ?? "—" },
+            { label: "Shopping", value: M.shopping ?? "—" },
+            { label: "Schools", value: M.schools ?? "—" },
+            { label: "Outdoors", value: M.outdoors ?? "—" },
+          ]
+        : fallbackNeighborhood.highlights,
+    stats:
+      M.walkScore !== undefined || M.uclaTime || M.gettyTime
+        ? [
+            { label: "Walk Score", value: M.walkScore !== undefined ? `${M.walkScore}` : "—" },
+            { label: "To UCLA", value: M.uclaTime ?? "—" },
+            { label: "To Getty", value: M.gettyTime ?? "—" },
+          ]
+        : fallbackNeighborhood.stats,
+  };
+
+  const similar = allProperties.filter((c) => c.type === M.type && c.id !== M.id).slice(0, 3);
+
   return (
     <motion.main
       initial="hidden"
@@ -54,16 +86,22 @@ export default function PropertyDetail({
         <motion.div variants={fadeUp}>
           <motion.div variants={scaleIn} className="relative rounded-[32px] overflow-hidden bg-[#E8E2DB] aspect-[16/11] group">
             <AnimatePresence mode="wait">
-              <motion.img
-                key={`${M.id}-${p}`}
-                src={M.images[p]}
-                alt={M.title}
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.45 }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              {currentImage ? (
+                <motion.img
+                  key={`${M.id}-${safeIndex}`}
+                  src={currentImage}
+                  alt={M.title}
+                  initial={{ opacity: 0, scale: 1.04 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.45 }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-[13px] opacity-50">
+                  No images in Strapi Gallery
+                </div>
+              )}
             </AnimatePresence>
             <div className="absolute top-5 left-5 flex gap-2">
               <div className="px-4 py-2 rounded-full bg-white/90 backdrop-blur text-[11px] font-[800]">
@@ -73,25 +111,30 @@ export default function PropertyDetail({
                 {M.type}
               </div>
             </div>
-            <div className="absolute top-5 right-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur text-[11px] font-[700]">
-              {p + 1} / {M.images.length}
-            </div>
-            <button
-              onClick={() => h((p - 1 + M.images.length) % M.images.length)}
-              className="absolute left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:bg-white transition"
-            >
-              ‹
-            </button>
-            <button
-              onClick={() => h((p + 1) % M.images.length)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:bg-white transition"
-            >
-              ›
-            </button>
+            {imageCount > 0 && (
+              <>
+                <div className="absolute top-5 right-5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur text-[11px] font-[700]">
+                  {safeIndex + 1} / {imageCount}
+                </div>
+                <button
+                  onClick={() => h((safeIndex - 1 + imageCount) % imageCount)}
+                  className="absolute left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:bg-white transition"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => h((safeIndex + 1) % imageCount)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center hover:bg-white transition"
+                >
+                  ›
+                </button>
+              </>
+            )}
             <div className="absolute bottom-5 left-5 right-5 flex justify-between items-end">
               <div className="px-4 py-3 rounded-[16px] bg-[#0A0A0A]/80 backdrop-blur text-white">
                 <div className="text-[11px] tracking-[0.1em] opacity-70">
-                  {M.location.toUpperCase()} • {M.coordinates}
+                  {M.location.toUpperCase()}
+                  {M.coordinates ? ` • ${M.coordinates}` : ""}
                 </div>
                 <div className="text-[20px] font-[700] tracking-[-0.02em] mt-1">{M.title}</div>
               </div>
@@ -104,7 +147,7 @@ export default function PropertyDetail({
                 key={idx}
                 onClick={() => h(idx)}
                 className={`relative rounded-[16px] overflow-hidden aspect-[1.2/1] border-2 transition ${
-                  p === idx ? "border-[#0A0A0A]" : "border-transparent opacity-70 hover:opacity-100"
+                  safeIndex === idx ? "border-[#0A0A0A]" : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
                 <img src={c} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -128,48 +171,43 @@ export default function PropertyDetail({
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.35 }}
                 >
-                  {(() => {
-                    const N = getNeighborhood(M.location);
-                    return (
-                      <div className="max-w-[64ch]">
-                        <div className="text-[11px] tracking-[0.14em] font-[700] opacity-40">
-                          {M.location.toUpperCase()} • {M.city.toUpperCase()}
+                  <div className="max-w-[64ch]">
+                    <div className="text-[11px] tracking-[0.14em] font-[700] opacity-40">
+                      {neighborhood.title}
+                    </div>
+                    <div className="mt-2 text-[15px] font-[600] opacity-70">{neighborhood.tagline}</div>
+                    <p className="mt-4 text-[16px] leading-[1.7] opacity-80">{neighborhood.description}</p>
+                    <div className="mt-8 grid md:grid-cols-2 gap-3">
+                      {neighborhood.highlights.map((c) => (
+                        <div
+                          key={c.label}
+                          className="p-4 rounded-[16px] bg-white border border-[#0A0A0A]/5"
+                        >
+                          <div className="text-[10px] tracking-[0.14em] font-[700] opacity-40">
+                            {c.label.toUpperCase()}
+                          </div>
+                          <div className="mt-2 text-[13px] font-[600] leading-[1.5]">{c.value}</div>
                         </div>
-                        <div className="mt-2 text-[15px] font-[600] opacity-70">{N.tagline}</div>
-                        <p className="mt-4 text-[16px] leading-[1.7] opacity-80">{N.description}</p>
-                        <div className="mt-8 grid md:grid-cols-2 gap-3">
-                          {N.highlights.map((c) => (
-                            <div
-                              key={c.label}
-                              className="p-4 rounded-[16px] bg-white border border-[#0A0A0A]/5"
-                            >
-                              <div className="text-[10px] tracking-[0.14em] font-[700] opacity-40">
-                                {c.label.toUpperCase()}
-                              </div>
-                              <div className="mt-2 text-[13px] font-[600] leading-[1.5]">{c.value}</div>
-                            </div>
-                          ))}
+                      ))}
+                    </div>
+                    <div className="mt-4 grid grid-cols-3 gap-3">
+                      {neighborhood.stats.map((c) => (
+                        <div
+                          key={c.label}
+                          className="rounded-[16px] bg-[#0A0A0A] text-white p-4 text-center"
+                        >
+                          <div className="text-[14px] font-[800]">{c.value}</div>
+                          <div className="text-[9px] tracking-[0.1em] font-[700] opacity-60 mt-1">
+                            {c.label.toUpperCase()}
+                          </div>
                         </div>
-                        <div className="mt-4 grid grid-cols-3 gap-3">
-                          {N.stats.map((c) => (
-                            <div
-                              key={c.label}
-                              className="rounded-[16px] bg-[#0A0A0A] text-white p-4 text-center"
-                            >
-                              <div className="text-[14px] font-[800]">{c.value}</div>
-                              <div className="text-[9px] tracking-[0.1em] font-[700] opacity-60 mt-1">
-                                {c.label.toUpperCase()}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="mt-6 text-[12px] opacity-50">
-                          We include a neighborhood dossier with HOA docs, disclosure packet, Walk Score, and MLS comps
-                          after viewing.
-                        </p>
-                      </div>
-                    );
-                  })()}
+                      ))}
+                    </div>
+                    <p className="mt-6 text-[12px] opacity-50">
+                      We include a neighborhood dossier with HOA docs, disclosure packet, Walk Score, and MLS comps
+                      after viewing.
+                    </p>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -185,7 +223,7 @@ export default function PropertyDetail({
             <div>
               <div className="text-[32px] font-[800] tracking-[-0.04em] leading-none">{formatPrice(M.price)}</div>
               <div className="mt-2 text-[12px] opacity-50 tracking-[0.06em]">
-                {M.location}, {M.city} • {M.sqft.toLocaleString()} FT²
+                {M.location}{M.city ? `, ${M.city}` : ""} • {M.sqft.toLocaleString()} FT²
               </div>
             </div>
             <div className="w-10 h-10 rounded-full bg-[#F7F5F2] flex items-center justify-center">♡</div>
@@ -223,7 +261,7 @@ export default function PropertyDetail({
               NR
             </div>
             <div className="flex-1">
-              <div className="text-[13px] font-[700]">Noir Representative</div>
+              <div className="text-[13px] font-[700]">{M.agentName ?? "Noir Representative"}</div>
               <div className="text-[11px] opacity-60">Curator • Los Angeles Archive</div>
             </div>
             <div className="w-2 h-2 rounded-full bg-[#3D4A3C]" />
@@ -267,10 +305,11 @@ export default function PropertyDetail({
             VIEW ALL →
           </button>
         </div>
+        {similar.length === 0 ? (
+          <div className="text-[13px] opacity-60">No similar residences published yet — publish more in Strapi.</div>
+        ) : (
         <div className="grid md:grid-cols-3 gap-6">
-          {PROPERTIES.filter((c) => c.type === M.type && c.id !== M.id)
-            .slice(0, 3)
-            .map((c, i) => (
+          {similar.map((c, i) => (
               <motion.button
                 key={c.id}
                 initial={{ opacity: 0, y: 24 }}
@@ -281,11 +320,13 @@ export default function PropertyDetail({
                 className="group text-left rounded-[24px] overflow-hidden bg-white border border-[#0A0A0A]/5 hover:-translate-y-1 transition-all"
               >
                 <div className="relative aspect-[1.3/1] bg-[#E8E2DB] overflow-hidden">
-                  <img
-                    src={c.images[0]}
-                    alt={c.title}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition duration-700"
-                  />
+                  {c.images[0] ? (
+                    <img
+                      src={c.images[0]}
+                      alt={c.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.05] transition duration-700"
+                    />
+                  ) : null}
                   <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white text-[11px] font-[700]">
                     {formatPrice(c.price)}
                   </span>
@@ -299,6 +340,7 @@ export default function PropertyDetail({
               </motion.button>
             ))}
         </div>
+        )}
       </motion.div>
     </motion.main>
   );

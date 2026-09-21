@@ -4,6 +4,7 @@ import {
   LOCATIONS,
   PRICE_MAX,
   PRICE_MIN,
+  PROPERTY_TYPES,
   SQFT_MAX,
   SQFT_MIN,
   YEAR_MAX,
@@ -126,7 +127,7 @@ export default function FiltersSidebar({
         <div>
           <div className="text-[11px] tracking-[0.14em] font-[700] opacity-40 mb-3">PROPERTY TYPE</div>
           <div className="flex gap-2 flex-wrap">
-            {["apartment", "villa", "land"].map((c) => (
+            {PROPERTY_TYPES.map((c) => (
               <button
                 key={c}
                 onClick={() => setTypes((prev) => toggleInList(prev, c))}

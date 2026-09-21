@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Toast from "./components/Toast";
@@ -8,27 +8,52 @@ import ListingsView, { type Layout, type SortKey } from "./components/ListingsVi
 import PropertyDetail, { type DetailTab } from "./components/PropertyDetail";
 import Footer from "./components/Footer";
 import { pageVariants } from "./lib/anim";
+import { fetchProperties } from "./lib/strapi";
 import {
   PRICE_MAX,
   PRICE_MIN,
-  PROPERTIES,
   SQFT_MAX,
   SQFT_MIN,
   YEAR_MAX,
   YEAR_MIN,
+  type Property,
 } from "./data/properties";
 
 export type View = "landing" | "listings" | "detail";
 
 export default function App() {
   const [view, setView] = useState<View>("landing");
-  const [selectedId, setSelectedId] = useState(1);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [layout, setLayout] = useState<Layout>("grid");
   const [sort, setSort] = useState<SortKey>("featured");
   const [tab, setTab] = useState<DetailTab>("neighborhood");
   const [imageIndex, setImageIndex] = useState(0);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchProperties();
+      setProperties(data);
+      setSelectedId((prev) => {
+        if (prev !== null && data.some((p) => p.id === prev)) return prev;
+        return data[0]?.id ?? null;
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load properties");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -55,18 +80,13 @@ export default function App() {
   const [amenityFilters, setAmenityFilters] = useState<string[]>([]);
   const [years, setYears] = useState<[number, number]>([YEAR_MIN, YEAR_MAX]);
 
-  const [searchLocation, setSearchLocation] = useState("");
-  const [searchType, setSearchType] = useState("");
-  const [minInput, setMinInput] = useState("");
-  const [maxInput, setMaxInput] = useState("");
-
-  const selected = useMemo(
-    () => PROPERTIES.find((c) => c.id === selectedId) || PROPERTIES[0],
-    [selectedId],
+  const selected: Property | undefined = useMemo(
+    () => properties.find((c) => c.id === selectedId) ?? properties[0],
+    [properties, selectedId],
   );
 
   const filtered = useMemo(() => {
-    let c = [...PROPERTIES];
+    let c = [...properties];
     if (locations.length > 0)
       c = c.filter((V) =>
         locations.some((W) => {
@@ -102,24 +122,11 @@ export default function App() {
         c.sort((V, W) => (W.featured ? 1 : 0) - (V.featured ? 1 : 0));
     }
     return c;
-  }, [locations, price, types, beds, baths, sqft, amenityFilters, years, sort]);
+  }, [properties, locations, price, types, beds, baths, sqft, amenityFilters, years, sort]);
 
   const curated = useMemo(() => {
-    return PROPERTIES.filter((V) => V.featured).slice(0, 4);
-  }, []);
-
-  const handleSearch = () => {
-    const c: string[] = [];
-    if (searchLocation) c.push(searchLocation);
-    setLocations(c);
-    if (searchType) setTypes([searchType]);
-    const V = minInput ? parseInt(minInput.replace(/[^0-9]/g, "")) : PRICE_MIN;
-    const W = maxInput ? parseInt(maxInput.replace(/[^0-9]/g, "")) : PRICE_MAX;
-    if (!isNaN(V) || !isNaN(W))
-      setPrice([isNaN(V) ? PRICE_MIN : V, isNaN(W) ? PRICE_MAX : W]);
-    navigate("listings");
-    window.scrollTo(0, 0);
-  };
+    return properties.slice(0, 4);
+  }, [properties]);
 
   const clearAll = () => {
     setLocations([]);
@@ -159,17 +166,46 @@ export default function App() {
           exit="exit"
           className="mx-auto max-w-[1440px] px-6 md:px-10 overflow-hidden"
         >
-          <Hero hero={PROPERTIES[0]} isSaved={saved.has(1)} onToggleSave={toggleSave} />
-          <CuratedSection
-            items={curated}
-            saved={saved}
-            onToggleSave={toggleSave}
-            onOpen={openDetail}
-            onViewAll={() => {
-              setView("listings");
-              window.scrollTo(0, 0);
-            }}
-          />
+          {loading ? (
+            <div className="py-24 text-center">
+              <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40">LOADING FROM STRAPI</div>
+              <div className="mt-3 text-[28px] font-[700] tracking-[-0.02em]">Fetching residences…</div>
+            </div>
+          ) : error ? (
+            <div className="py-24 text-center">
+              <div className="text-[11px] tracking-[0.18em] font-[700] text-red-600">STRAPI CONNECTION FAILED</div>
+              <div className="mt-3 text-[18px] font-[600]">{error}</div>
+              <div className="mt-2 text-[13px] opacity-60">Is Strapi running at http://localhost:1337 with public find permission?</div>
+              <button
+                onClick={load}
+                className="mt-6 h-11 px-6 rounded-full bg-[#0A0A0A] text-white text-[12px] font-[700] tracking-[0.08em]"
+              >
+                RETRY
+              </button>
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="py-24 text-center">
+              <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40">NO PROPERTIES PUBLISHED</div>
+              <div className="mt-3 text-[28px] font-[700] tracking-[-0.02em]">Publish a Property in Strapi to see it here.</div>
+            </div>
+          ) : (
+            <>
+              {curated[0] && (
+                <Hero hero={curated[0]} isSaved={saved.has(curated[0].id)} onToggleSave={toggleSave} />
+              )}
+              <CuratedSection
+                items={curated}
+                total={properties.length}
+                saved={saved}
+                onToggleSave={toggleSave}
+                onOpen={openDetail}
+                onViewAll={() => {
+                  setView("listings");
+                  window.scrollTo(0, 0);
+                }}
+              />
+            </>
+          )}
           <Footer />
         </motion.main>
       )}
@@ -209,10 +245,11 @@ export default function App() {
         </motion.div>
       )}
 
-      {view === "detail" && (
-        <motion.div key={`detail-${selectedId}`} variants={pageVariants} initial="hidden" animate="show" exit="exit">
+      {view === "detail" && selected && (
+        <motion.div key={`detail-${selected.id}`} variants={pageVariants} initial="hidden" animate="show" exit="exit">
         <PropertyDetail
           property={selected}
+          allProperties={properties}
           imageIndex={imageIndex}
           setImageIndex={setImageIndex}
           tab={tab}

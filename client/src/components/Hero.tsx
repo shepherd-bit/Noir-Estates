@@ -60,11 +60,13 @@ export default function Hero({ hero, isSaved, onToggleSave }: Props) {
 
         <motion.div variants={scaleIn} className="relative min-w-0">
           <div className="relative rounded-[32px] overflow-hidden bg-[#E8E2DB] aspect-[4/4.6] md:aspect-[4/5] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.35)] group">
-            <img
-              src={hero.images[0]}
-              alt={hero.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.6s] group-hover:scale-[1.06]"
-            />
+            {hero.images[0] ? (
+              <img
+                src={hero.images[0]}
+                alt={hero.title}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.6s] group-hover:scale-[1.06]"
+              />
+            ) : null}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent" />
             <div className="absolute top-5 left-5 right-5 flex justify-between">
               <div className="px-3.5 py-2 rounded-full bg-white/90 backdrop-blur text-[11px] font-[700] tracking-[0.06em]">
