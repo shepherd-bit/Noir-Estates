@@ -23,11 +23,11 @@ export default function CuratedSection({ filter, setFilter, items, saved, onTogg
     >
       <motion.div variants={fadeUp} className="flex flex-wrap items-end justify-between gap-6 mb-10">
         <div>
-          <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40 mb-3">CURATED SELECTION — 001/006</div>
+          <div className="text-[11px] tracking-[0.18em] font-[700] opacity-40 mb-3">LATEST LISTINGS</div>
           <h2 className="text-[44px] md:text-[64px] font-[800] tracking-[-0.05em] leading-[0.9]">
-            Not for
+            Explore your
             <br />
-            everyone.
+            for your taste.
           </h2>
         </div>
         <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#E8E2DB]">
