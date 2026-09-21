@@ -74,3 +74,129 @@ export function formatPrice(e: number): string {
   if (e >= 1000) return `$${Math.round(e / 1000)}K`;
   return `$${e}`;
 }
+
+export interface NeighborhoodInfo {
+  tagline: string;
+  description: string;
+  highlights: { label: string; value: string }[];
+  stats: { label: string; value: string }[];
+}
+
+export const NEIGHBORHOODS: Record<string, NeighborhoodInfo> = {
+  "Beverly Hills": {
+    tagline: "Trousdale • Rodeo Drive • 12 min to Century City",
+    description:
+      "Prime Beverly Hills living with tree-lined Flats, Trousdale Estates views, and Rodeo Drive at your door. Days run on Erewhon runs, Blue Bottle mornings, and golden-hour strolls to Canon Gardens. Quiet, patrolled streets with exceptional light and privacy — yet Century City, West Hollywood and the 405 are minutes away.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Erewhon, Blue Bottle, Spago, Canon restaurants" },
+      { label: "Shopping", value: "Rodeo Drive, Beverly Center, Century City Mall" },
+      { label: "Schools", value: "Beverly Hills High, Good Shepherd, Harvard-Westlake nearby" },
+      { label: "Outdoors", value: "Trousdale Park, Coldwater Canyon hikes, Virginia Robinson Gardens" },
+    ],
+    stats: [
+      { label: "Walk Score", value: "72" },
+      { label: "Quiet at night", value: "92" },
+      { label: "To Century City", value: "12 min" },
+    ],
+  },
+  Malibu: {
+    tagline: "Carbon Beach • PCH • Surf at the stairs",
+    description:
+      "Billionaire's Beach bluff living with marine-layer mornings and indoor-outdoor California modern. Private beach gates, paddle-outs before work, and sunset dinners on the deck. Soho House Malibu, Nobu and Erewhon Malibu up PCH, with Topanga hiking and Pepperdine minutes away.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Nobu, Soho House, Erewhon Malibu, Malibu Farm" },
+      { label: "Shopping", value: "Malibu Country Mart, Malibu Village" },
+      { label: "Schools", value: "Malibu High, Webster Elementary, Pepperdine University" },
+      { label: "Outdoors", value: "Carbon Beach access, Zuma, Solstice Canyon trails" },
+    ],
+    stats: [
+      { label: "Beach access", value: "Private gates" },
+      { label: "To Santa Monica", value: "25 min" },
+      { label: "Air quality", value: "Ocean-clean" },
+    ],
+  },
+  Brentwood: {
+    tagline: "San Vicente • Getty • Country Mart loop",
+    description:
+      "Leafy Brentwood village life off San Vicente — morning runs on the Country Club loop, afternoons at the Getty. Brentwood Country Mart, Erewhon and Tavern for everyday luxury. Top-rated Kenter Canyon Elementary district with Mandeville Canyon trails out the back door.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Brentwood Country Mart, Erewhon, Tavern, Coral Tree Café" },
+      { label: "Shopping", value: "San Vicente shops, Century City Mall 10 min" },
+      { label: "Schools", value: "Kenter Canyon Elementary, Brentwood School, Archer" },
+      { label: "Outdoors", value: "Mandeville Canyon, Getty gardens, San Vicente run corridor" },
+    ],
+    stats: [
+      { label: "Walk Score", value: "68" },
+      { label: "To UCLA", value: "10 min" },
+      { label: "To Getty", value: "5 min" },
+    ],
+  },
+  "Pacific Palisades": {
+    tagline: "Palisades Village • Bluff parks • Farmers market Sundays",
+    description:
+      "Village-first coastal living steps from Palisades Village — Erewhon, Blue Bottle and the Sunday farmers market. Bluff-top parks with whitewater views from Palos Verdes to Point Dume, Temescal Canyon hiking, and top-rated Palisades High. Family-quiet, dog-friendly, ocean-breezed.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Erewhon Village, Blue Bottle, Porta Via, Edo Sushi" },
+      { label: "Shopping", value: "Palisades Village, Whole Foods, Sunday farmers market" },
+      { label: "Schools", value: "Palisades High, Village School, Calvary Christian" },
+      { label: "Outdoors", value: "Temescal Canyon, Will Rogers Beach, Palisades Bluff Park" },
+    ],
+    stats: [
+      { label: "Walk Score", value: "70" },
+      { label: "To Santa Monica", value: "12 min" },
+      { label: "Parks nearby", value: "6+" },
+    ],
+  },
+  "Bel Air": {
+    tagline: "Gated canyons • Country Club • No through-traffic",
+    description:
+      "Lower Bel Air canyon privacy under 100-year-old sycamores — gated, hedged, hummingbirds not freeways. Bel-Air Country Club golf out the gate, UCLA and the Getty 10 minutes, Harvard-Westlake and Marymount for schools. Five minutes to Beverly Hills, worlds away in feel.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Hotel Bel-Air, Beverly Hills restaurants 5 min" },
+      { label: "Shopping", value: "Rodeo Drive 8 min, Westwood Village 7 min" },
+      { label: "Schools", value: "Harvard-Westlake, Marymount, Roscomare Elementary" },
+      { label: "Outdoors", value: "Stone Canyon trails, Bel-Air Country Club, Franklin Canyon" },
+    ],
+    stats: [
+      { label: "Privacy", value: "Gated canyons" },
+      { label: "To UCLA", value: "10 min" },
+      { label: "To Beverly Hills", value: "5 min" },
+    ],
+  },
+  "Holmby Hills": {
+    tagline: "The Flats • LA Country Club • Mature palms",
+    description:
+      "Holmby Hills Flats prestige — wide lots, mature palms, and the Los Angeles Country Club as your backyard. Holmby Park mornings, UCLA and Century City in minutes, Beverly Hills dining next door. Embassy-quiet streets with 24-hour patrol and legacy architecture.",
+    highlights: [
+      { label: "Dining & Cafés", value: "Nate'n Al's, Beverly Hills fine dining, Westwood cafés" },
+      { label: "Shopping", value: "Rodeo Drive, Century City Mall, Westwood Village" },
+      { label: "Schools", value: "Harvard-Westlake, Marlborough, Emerson Middle" },
+      { label: "Outdoors", value: "Holmby Park, LA Country Club golf, Franklin Canyon" },
+    ],
+    stats: [
+      { label: "To UCLA", value: "8 min" },
+      { label: "To Century City", value: "7 min" },
+      { label: "Lot character", value: "Wide + gated" },
+    ],
+  },
+};
+
+export function getNeighborhood(location: string): NeighborhoodInfo {
+  return (
+    NEIGHBORHOODS[location] ?? {
+      tagline: `${location} • Los Angeles`,
+      description: `Established ${location} pocket with daily essentials close — cafés, markets, top-rated schools and canyon or coastal trails within minutes. Quiet residential streets with quick access to Century City, UCLA and the Westside.`,
+      highlights: [
+        { label: "Dining & Cafés", value: "Erewhon, Blue Bottle, local village spots" },
+        { label: "Shopping", value: "Village shops + Century City Mall nearby" },
+        { label: "Schools", value: "Top-rated LAUSD + private schools nearby" },
+        { label: "Outdoors", value: "Santa Monica Mountains trails within minutes" },
+      ],
+      stats: [
+        { label: "Walk Score", value: "68" },
+        { label: "Quiet at night", value: "90" },
+        { label: "To Century City", value: "~12 min" },
+      ],
+    }
+  );
+}

@@ -1,15 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { PROPERTIES, formatPrice, type Property } from "../data/properties";
+import { PROPERTIES, formatPrice, getNeighborhood, type Property } from "../data/properties";
 import { fadeUp, scaleIn, slideFromRight, staggerParent } from "../lib/anim";
 
-export type DetailTab = "overview" | "features" | "floorplan" | "neighborhood";
+export type DetailTab = "neighborhood";
 
 interface Props {
   property: Property;
   imageIndex: number;
   setImageIndex: (v: number) => void;
-  tab: DetailTab;
-  setTab: (v: DetailTab) => void;
+  tab?: DetailTab;
+  setTab?: (v: DetailTab) => void;
   onBackToListings: () => void;
   onBackToLanding: () => void;
   onOpen: (id: number) => void;
@@ -19,8 +19,6 @@ export default function PropertyDetail({
   property: M,
   imageIndex: p,
   setImageIndex: h,
-  tab: y,
-  setTab: X,
   onBackToListings,
   onBackToLanding,
   onOpen,
@@ -116,118 +114,62 @@ export default function PropertyDetail({
 
           <div className="mt-10">
             <div className="flex gap-2 p-1 rounded-full bg-[#E8E2DB] w-fit">
-              {(["overview", "features", "floorplan", "neighborhood"] as DetailTab[]).map((c) => (
-                <button
-                  key={c}
-                  onClick={() => X(c)}
-                  className={`px-5 h-[36px] rounded-full text-[12px] font-[600] tracking-[0.04em] capitalize transition ${
-                    y === c ? "bg-[#0A0A0A] text-white" : "hover:bg-white/70"
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
+              <span className="px-5 h-[36px] rounded-full text-[12px] font-[600] tracking-[0.04em] bg-[#0A0A0A] text-white flex items-center">
+                Neighborhood Overview
+              </span>
             </div>
 
             <div className="mt-8">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={y}
+                  key={M.id}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.35 }}
                 >
-              {y === "overview" && (
-                <div className="max-w-[64ch]">
-                  <p className="text-[20px] leading-[1.5] font-[400] tracking-[-0.02em]">{M.description}</p>
-                  <p className="mt-6 text-[14px] leading-[1.7] opacity-60">
-                    Every Noir residence is vetted for light, proportion, and material honesty. We photograph at golden
-                    hour, measure in silence, and list only what we would live in. This property includes deeded
-                    access, architectural drawings, and introduction to the original studio.
-                  </p>
-                  <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      { k: "Bedrooms", v: M.beds === 0 ? "—" : M.beds },
-                      { k: "Bathrooms", v: M.baths === 0 ? "—" : M.baths },
-                      { k: "Living Area", v: `${M.sqft.toLocaleString()} ft²` },
-                      { k: "Year Built", v: M.yearBuilt },
-                    ].map((c) => (
-                      <div
-                        key={c.k}
-                        className="rounded-[20px] bg-white border border-[#0A0A0A]/5 p-5"
-                      >
-                        <div className="text-[10px] tracking-[0.14em] font-[700] opacity-40">
-                          {c.k.toUpperCase()}
+                  {(() => {
+                    const N = getNeighborhood(M.location);
+                    return (
+                      <div className="max-w-[64ch]">
+                        <div className="text-[11px] tracking-[0.14em] font-[700] opacity-40">
+                          {M.location.toUpperCase()} • {M.city.toUpperCase()}
                         </div>
-                        <div className="text-[18px] font-[700] mt-2">{c.v}</div>
+                        <div className="mt-2 text-[15px] font-[600] opacity-70">{N.tagline}</div>
+                        <p className="mt-4 text-[16px] leading-[1.7] opacity-80">{N.description}</p>
+                        <div className="mt-8 grid md:grid-cols-2 gap-3">
+                          {N.highlights.map((c) => (
+                            <div
+                              key={c.label}
+                              className="p-4 rounded-[16px] bg-white border border-[#0A0A0A]/5"
+                            >
+                              <div className="text-[10px] tracking-[0.14em] font-[700] opacity-40">
+                                {c.label.toUpperCase()}
+                              </div>
+                              <div className="mt-2 text-[13px] font-[600] leading-[1.5]">{c.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 grid grid-cols-3 gap-3">
+                          {N.stats.map((c) => (
+                            <div
+                              key={c.label}
+                              className="rounded-[16px] bg-[#0A0A0A] text-white p-4 text-center"
+                            >
+                              <div className="text-[14px] font-[800]">{c.value}</div>
+                              <div className="text-[9px] tracking-[0.1em] font-[700] opacity-60 mt-1">
+                                {c.label.toUpperCase()}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="mt-6 text-[12px] opacity-50">
+                          We include a neighborhood dossier with HOA docs, disclosure packet, Walk Score, and MLS comps
+                          after viewing.
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {y === "features" && (
-                <div className="grid md:grid-cols-2 gap-3 max-w-[64ch]">
-                  {M.amenities.map((c) => (
-                    <div
-                      key={c}
-                      className="flex items-center gap-3 p-4 rounded-[16px] bg-white border border-[#0A0A0A]/5"
-                    >
-                      <span className="w-9 h-9 rounded-full bg-[#F7F5F2] flex items-center justify-center text-[14px]">
-                        ✓
-                      </span>
-                      <span className="text-[13px] font-[600]">{c}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {y === "floorplan" && (
-                <div className="rounded-[28px] bg-white border border-[#0A0A0A]/5 p-8 max-w-[560px]">
-                  <div className="text-[11px] tracking-[0.14em] font-[700] opacity-40 mb-6">
-                    LEVEL 01 — ARCHITECTURAL SKETCH
-                  </div>
-                  <svg viewBox="0 0 400 260" className="w-full h-auto">
-                    <rect x="20" y="20" width="360" height="220" fill="none" stroke="#0A0A0A" strokeWidth="1.2" strokeDasharray="6 6" rx="8" />
-                    <rect x="20" y="20" width="140" height="90" fill="#F7F5F2" stroke="#0A0A0A" strokeWidth="1" />
-                    <rect x="180" y="20" width="200" height="90" fill="#E8E2DB" stroke="#0A0A0A" strokeWidth="1" />
-                    <rect x="20" y="130" width="100" height="110" fill="#F7F5F2" stroke="#0A0A0A" strokeWidth="1" />
-                    <rect x="140" y="130" width="240" height="110" fill="none" stroke="#0A0A0A" strokeWidth="1" />
-                    <text x="30" y="50" fontSize="10" fontWeight="600" fill="#0A0A0A">
-                      LIVING — 260 FT²
-                    </text>
-                    <text x="190" y="50" fontSize="10" fontWeight="600" fill="#0A0A0A">
-                      TERRACE / POOL
-                    </text>
-                    <text x="30" y="160" fontSize="10" fontWeight="600" fill="#0A0A0A">
-                      BED 1
-                    </text>
-                    <text x="150" y="160" fontSize="10" fontWeight="600" fill="#0A0A0A">
-                      OPEN PLAN — GALLERY
-                    </text>
-                  </svg>
-                  <div className="mt-6 text-[12px] opacity-50">
-                    Not to scale. Full CAD + material board available after viewing.
-                  </div>
-                </div>
-              )}
-
-              {y === "neighborhood" && (
-                <div className="max-w-[60ch] space-y-4 text-[14px] leading-[1.7]">
-                  <p className="opacity-80">
-                    <strong className="text-[#0A0A0A]">Beverly Hills / Bel Air / Westside:</strong> Each Noir pocket has
-                    a rhythm. Beverly Hills — Trousdale, Rodeo Drive, 12 minutes to Century City. Bel Air &amp; Holmby
-                    Hills — gated canyons, country clubs, no through-traffic by design. Malibu &amp; Pacific Palisades —
-                    bluff geology, marine layer mornings, indoor-outdoor California modern.
-                  </p>
-                  <p className="opacity-60">
-                    Walk Score 72, quiet at night 92, light quality exceptional. Erewhon, Blue Bottle, top-rated LAUSD
-                    and private schools, and hiking in the Santa Monica Mountains within minutes. We include a
-                    neighborhood dossier with HOA docs, disclosure packet, Walk Score, and comps from the MLS.
-                  </p>
-                </div>
-              )}
+                    );
+                  })()}
                 </motion.div>
               </AnimatePresence>
             </div>

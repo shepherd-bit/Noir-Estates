@@ -26,7 +26,7 @@ export default function App() {
   const [landingFilter, setLandingFilter] = useState("all");
   const [layout, setLayout] = useState<Layout>("grid");
   const [sort, setSort] = useState<SortKey>("featured");
-  const [tab, setTab] = useState<DetailTab>("overview");
+  const [tab, setTab] = useState<DetailTab>("neighborhood");
   const [imageIndex, setImageIndex] = useState(0);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
